@@ -1,26 +1,38 @@
 package DBL;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  *
  * @author aryan
  */
-public class ReadFile {
-
-    public String[][] readFile(String filePath) {
+public class Api {
+    
+    String filePath;
+    
+    public Api(String filePath){
+        
+        this.filePath = filePath;
+        
+    }
+    
+    
+    // method returns a nested array after reading file
+    public String[][] readFile() {
        
         // finding the length for the multidimensional array depending upon the
         // file passsed in arguement
         
-        Path path = Paths.get(filePath);
+        Path path = Paths.get(this.filePath);
         long lines = 0;
         
         try {
@@ -37,7 +49,7 @@ public class ReadFile {
         int arraySize2 = 0;
         
         try {
-            File obj = new File(filePath);
+            File obj = new File(this.filePath);
             Scanner  reader = new Scanner(obj);
             String line = reader.nextLine();
             
@@ -55,7 +67,7 @@ public class ReadFile {
         
         // reading the file passed as arguement
         try {
-            File obj = new File(filePath);
+            File obj = new File(this.filePath);
             Scanner reader = new Scanner(obj);
             int i=0;
             while (reader.hasNextLine()) {
@@ -81,5 +93,30 @@ public class ReadFile {
         return arr;
         
     }
-
+    
+    
+    // method to append data in given file
+     public void appendStrToFile(String str){
+        
+        try{
+            // open given file in append mode by creating an 
+            // object of BufferWriter class
+            BufferedWriter out = new BufferedWriter(new FileWriter(this.filePath, true));
+            
+            out.write(str);
+            
+            out.close();
+        } catch(IOException e){
+            
+            // Display message wehn exception occurs;
+            
+            System.out.println("exception occured "+ e);
+        }
+    }
+     
+    public void deleteData() {
+        File orgFile = new File(this.filePath);
+        orgFile.delete();
+        File newFile = new File(this.filePath);
+    }
 }

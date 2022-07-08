@@ -1,7 +1,6 @@
 package Auth;
 
-import DBL.AppendData;
-import DBL.ReadFile;
+import DBL.Api;
 
 public class ManagingUser extends User {
 
@@ -19,15 +18,16 @@ public class ManagingUser extends User {
         this.post = "Managing";
     }
 
+    @Override
     public boolean login(String username, String password) {
+        
+        Api api = new Api("./src/saveData/users.txt");
 
-        ReadFile reader = new ReadFile();
-
-        String[][] data = reader.readFile("./src/saveData/users.txt");
+        String[][] data = api.readFile();
         System.out.println(data.length);
-
+  
         for (int i = 0; i <= data.length; i++) {
-            String savedUsername = data[i][1];
+             String savedUsername = data[i][1];
             String savedPassword = data[i][4];
             System.out.println("Username:" + savedUsername);
             System.out.println("Password:" + savedPassword);
@@ -40,13 +40,16 @@ public class ManagingUser extends User {
         System.out.println("login");
         return false;
     }
-
+ 
+     @Override
     public void register() {
-        AppendData appender = new AppendData();
+        
+         Api api = new Api("./src/saveData/users.txt");
+         
         String data = this.name + "," + this.username + "," + this.email + ","
                 + this.phoneNo + "," + this.password + "," + this.post + "\n";
         String file = "./src/saveData/users.txt";
-        appender.appendStrToFile(file, data);
+        api.appendStrToFile(data);
     }
 
     public void addOrder(String orderId) {

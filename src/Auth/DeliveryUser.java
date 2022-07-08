@@ -1,6 +1,6 @@
 package Auth;
 
-import DBL.AppendData;
+import DBL.Api;
 
 public class DeliveryUser extends User {
 
@@ -10,7 +10,7 @@ public class DeliveryUser extends User {
         this.email = email;
         this.phoneNo = phoneNo;
         this.password = password;
-        this.post = "Managing";
+        this.post = "Delivery";
     }
 
     public boolean login(String username, String password) {
@@ -19,13 +19,9 @@ public class DeliveryUser extends User {
     }
 
     public void register() {
-        AppendData appender = new AppendData();
+        Api api = new Api("./src/saveData/users.txt");
         String data = this.name + "," + this.username + "," + this.email + ","
                 + this.phoneNo + "," + this.password + "," + this.post + "\n";
-        String file = "./src/saveData/users.txt";
-        appender.appendStrToFile(file, data);
+        api.appendStrToFile(data);
     }
-    
-    
-
 }

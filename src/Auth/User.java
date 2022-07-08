@@ -1,7 +1,5 @@
 package Auth;
 
-import DBL.AppendData;
-
 abstract class User {
 
     protected String name, username, email, phoneNo, password, post;

@@ -2,8 +2,7 @@ package View;
 
 import Auth.DeliveryUser;
 import Auth.ManagingUser;
-import DBL.AppendData;
-import DBL.ReadFile;
+import DBL.Api;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -11,36 +10,36 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author aryan
  */
-public class Home extends javax.swing.JFrame {
+public class ManagingUserHome extends javax.swing.JFrame {
 
     // validate each fields if its empty
     private boolean validator() {
 
         if (nameField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(Home.this, "Enter name");
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter name");
             nameField.grabFocus();
             return false;
         }
 
         if (usernameField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(Home.this, "Enter username");
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter username");
             usernameField.grabFocus();
             return false;
         }
 
         if (emailField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(Home.this, "Enter email");
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter email");
             emailField.grabFocus();
             return false;
         }
 
         if (phoneNoField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(Home.this, "Enter phone number");
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter phone number");
             phoneNoField.grabFocus();
             return false;
         }
         if (passwordField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(Home.this, "Enter password");
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter password");
             passwordField.grabFocus();
             return false;
         }
@@ -59,9 +58,9 @@ public class Home extends javax.swing.JFrame {
     // inserts data into the table
     private void populateTable() {
 
-        ReadFile file = new ReadFile();
+        Api api = new Api("./src/saveData/users.txt");
 
-        String[][] data = file.readFile("./src/saveData/users.txt");
+        String[][] data = api.readFile();
 
         if (data != null) {
             for (int i = 0; i < data.length; i++) {
@@ -89,7 +88,7 @@ public class Home extends javax.swing.JFrame {
 
     DefaultTableModel model;
 
-    public Home(String username) {
+    public ManagingUserHome(String username) {
         initComponents();
         this.username = username;
         this.welcomeUserLbl.setText("Hello " + this.username);
@@ -134,7 +133,13 @@ public class Home extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Home");
         setResizable(false);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
 
+        welcomeUserLbl.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         welcomeUserLbl.setText("Welcome");
 
         addUserBtn.setText("Add User");
@@ -149,7 +154,12 @@ public class Home extends javax.swing.JFrame {
             }
         });
 
-        updateUserBtn.setText("Update User");
+        updateUserBtn.setText("Save changes");
+        updateUserBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                updateUserBtnMouseClicked(evt);
+            }
+        });
         updateUserBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateUserBtnActionPerformed(evt);
@@ -157,6 +167,11 @@ public class Home extends javax.swing.JFrame {
         });
 
         deleteUserBtn.setText("Delete");
+        deleteUserBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                deleteUserBtnMouseClicked(evt);
+            }
+        });
         deleteUserBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteUserBtnActionPerformed(evt);
@@ -192,6 +207,7 @@ public class Home extends javax.swing.JFrame {
         title.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         title.setText("Users");
 
+        userTable.setAutoCreateRowSorter(true);
         userTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -199,15 +215,7 @@ public class Home extends javax.swing.JFrame {
             new String [] {
                 "Name", "Username", "Email", "Phone No.", "Password", "Position"
             }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        ));
         userDetailContainer.setViewportView(userTable);
         if (userTable.getColumnModel().getColumnCount() > 0) {
             userTable.getColumnModel().getColumn(0).setResizable(false);
@@ -314,8 +322,8 @@ public class Home extends javax.swing.JFrame {
                 .addGroup(usersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(usersTabLayout.createSequentialGroup()
                         .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(494, Short.MAX_VALUE))
-                    .addComponent(userDetailContainer)))
+                        .addContainerGap())
+                    .addComponent(userDetailContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)))
         );
         usersTabLayout.setVerticalGroup(
             usersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -325,8 +333,7 @@ public class Home extends javax.swing.JFrame {
                     .addGroup(usersTabLayout.createSequentialGroup()
                         .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(userDetailContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 444, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(userDetailContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 444, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(usersTabLayout.createSequentialGroup()
                         .addComponent(userFormContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(5, 5, 5)
@@ -403,14 +410,14 @@ public class Home extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(welcomeUserLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(welcomeUserLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -468,9 +475,9 @@ public class Home extends javax.swing.JFrame {
                         phoneNo, password);
                 user.register();
             }
-
+            model.setRowCount(0);
             populateTable();
-            JOptionPane.showMessageDialog(Home.this, position);
+            JOptionPane.showMessageDialog(ManagingUserHome.this, position);
 
             clearFields();
         }
@@ -483,6 +490,86 @@ public class Home extends javax.swing.JFrame {
     private void emailFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_emailFieldActionPerformed
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        userTable.clearSelection();
+    }//GEN-LAST:event_formMouseClicked
+
+    private void deleteUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteUserBtnMouseClicked
+        // TODO add your handling code here:
+
+        // checking if user has selected any row
+        if (userTable.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Select a row");
+            return;
+        }
+
+        // removing row in user side
+        model.removeRow(userTable.getSelectedRow());
+
+        // creating Api object
+        Api api = new Api("./src/saveData/users.txt");
+
+        // calling deleteData method to delete the existing file and creating 
+        // a new file with the same name
+        api.deleteData();
+
+        // looping through the table and appending each row data in the new
+        // file
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String name = (String) model.getValueAt(i, 0);
+            String username = (String) model.getValueAt(i, 1);
+            String email = (String) model.getValueAt(i, 2);
+            String phoneNo = (String) model.getValueAt(i, 3);
+            String password = (String) model.getValueAt(i, 4);
+            String position = (String) model.getValueAt(i, 5);
+
+            String data = name + "," + username + "," + email + ","
+                    + phoneNo + "," + password + "," + position + "\n";
+
+            api.appendStrToFile(data);
+        }
+
+        // resetting table and populating the table again by reading the newly
+        // created and appended file
+        model.setRowCount(0);
+        populateTable();
+
+        JOptionPane.showMessageDialog(ManagingUserHome.this, "User Deleted");
+    }//GEN-LAST:event_deleteUserBtnMouseClicked
+
+    private void updateUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_updateUserBtnMouseClicked
+        
+        // creating an Api object
+        Api api = new Api("./src/saveData/users.txt");
+        
+        // calling deleteData method to delete the exisitng file and creating 
+        // a new file with the same name
+        api.deleteData();
+        
+        // looping throuth the table and appending each row data in the new 
+        // file
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String name = (String) model.getValueAt(i, 0);
+            String username = (String) model.getValueAt(i, 1);
+            String email = (String) model.getValueAt(i, 2);
+            String phoneNo = (String) model.getValueAt(i, 3);
+            String password = (String) model.getValueAt(i, 4);
+            String position = (String) model.getValueAt(i, 5);
+
+            String data = name + "," + username + "," + email + ","
+                    + phoneNo + "," + password + "," + position + "\n";
+
+            api.appendStrToFile(data);
+
+        }
+        
+        // resetting table and populating the table again by reading the newly
+        // created and appended file
+        model.setRowCount(0);
+        populateTable();
+        JOptionPane.showMessageDialog(ManagingUserHome.this, "Table Updated");
+    }//GEN-LAST:event_updateUserBtnMouseClicked
 
     /**
      * @param args the command line arguments
