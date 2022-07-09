@@ -1,6 +1,6 @@
-package Auth;
+package AL.User;
 
-import DBL.Api;
+import DBL.HandleFile;
 
 public class ManagingUser extends User {
 
@@ -21,7 +21,7 @@ public class ManagingUser extends User {
     @Override
     public boolean login(String username, String password) {
         
-        Api api = new Api("./src/saveData/users.txt");
+        HandleFile api = new HandleFile("./src/saveData/users.txt");
 
         String[][] data = api.readFile();
         System.out.println(data.length);
@@ -29,8 +29,6 @@ public class ManagingUser extends User {
         for (int i = 0; i <= data.length; i++) {
              String savedUsername = data[i][1];
             String savedPassword = data[i][4];
-            System.out.println("Username:" + savedUsername);
-            System.out.println("Password:" + savedPassword);
 
             if (username.equals(savedUsername) && password.equals(savedPassword)) {
                 return true;
@@ -44,7 +42,7 @@ public class ManagingUser extends User {
      @Override
     public void register() {
         
-         Api api = new Api("./src/saveData/users.txt");
+         HandleFile api = new HandleFile("./src/saveData/users.txt");
          
         String data = this.name + "," + this.username + "," + this.email + ","
                 + this.phoneNo + "," + this.password + "," + this.post + "\n";

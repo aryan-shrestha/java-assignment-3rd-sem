@@ -15,16 +15,17 @@ import java.util.Scanner;
  *
  * @author aryan
  */
-public class Api {
+
+// requires filePath as arguement for constructor
+public class HandleFile {
     
     String filePath;
     
-    public Api(String filePath){
+    public HandleFile(String filePath){
         
         this.filePath = filePath;
         
-    }
-    
+    }   
     
     // method returns a nested array after reading file
     public String[][] readFile() {
@@ -38,13 +39,11 @@ public class Api {
         try {
             lines = Files.lines(path).count();
         } catch(IOException e){
-            e.printStackTrace();
         } catch(NoSuchElementException e) {
             String arr[][] = null;
             return arr;
         }
-        
-        
+           
         int arraySize1 = (int)lines;
         int arraySize2 = 0;
         
@@ -53,7 +52,8 @@ public class Api {
             Scanner  reader = new Scanner(obj);
             String line = reader.nextLine();
             
-            // passing negative value in 2nd parameter enables returning array to be of any size
+            // passing negative value in 2nd parameter enables returning array
+            // to be of any size
             String[] data = line.split(",", -1);        
             arraySize2 = data.length;
             reader.close();
@@ -63,7 +63,6 @@ public class Api {
         
         // initializing arrya with the size that is discoved above
         String[][] arr= new String[arraySize1][arraySize2];
-        
         
         // reading the file passed as arguement
         try {
@@ -86,15 +85,13 @@ public class Api {
             reader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occured.");
-            e.printStackTrace();
         }
         
         // returning array "arr"
         return arr;
         
     }
-    
-    
+      
     // method to append data in given file
      public void appendStrToFile(String str){
         

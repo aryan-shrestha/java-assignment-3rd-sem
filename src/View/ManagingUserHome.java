@@ -1,9 +1,11 @@
 package View;
 
-import Auth.DeliveryUser;
-import Auth.ManagingUser;
-import DBL.Api;
+import AL.Order.Order;
+import AL.User.DeliveryUser;
+import AL.User.ManagingUser;
+import DBL.HandleFile;
 import javax.swing.JOptionPane;
+
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -13,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
 public class ManagingUserHome extends javax.swing.JFrame {
 
     // validate each fields if its empty
-    private boolean validator() {
+    private boolean UserFormValidator() {
 
         if (nameField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter name");
@@ -46,8 +48,33 @@ public class ManagingUserHome extends javax.swing.JFrame {
         return true;
     }
 
+    private boolean orderFormValidator() {
+
+        if (orderIdTxt.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter name");
+            orderIdTxt.grabFocus();
+            return false;
+        }
+
+        if (customerNameTxt.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter "
+                    + "customer name");
+            customerNameTxt.grabFocus();
+            return false;
+        }
+
+        if (totalTxt.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter "
+                    + "total amount");
+            totalTxt.grabFocus();
+            return false;
+        }
+
+        return true;
+    }
+
     // reset all the input fields 
-    private void clearFields() {
+    private void clearUserForm() {
         nameField.setText("name");
         usernameField.setText("username");
         emailField.setText("email");
@@ -55,12 +82,19 @@ public class ManagingUserHome extends javax.swing.JFrame {
         passwordField.setText("password");
     }
 
-    // inserts data into the table
-    private void populateTable() {
+    private void clearOrderForm() {
+        orderIdTxt.setText("");
+        customerNameTxt.setText("");
+        totalTxt.setText("");
 
-        Api api = new Api("./src/saveData/users.txt");
+    }
 
-        String[][] data = api.readFile();
+    // inserts data into the user table
+    private void populateUserTable() {
+
+        HandleFile file = new HandleFile("./src/saveData/users.txt");
+
+        String[][] data = file.readFile();
 
         if (data != null) {
             for (int i = 0; i < data.length; i++) {
@@ -70,13 +104,40 @@ public class ManagingUserHome extends javax.swing.JFrame {
                 String phoneNo = data[i][3];
                 String password = data[i][4];
                 String position = data[i][5];
-                model.insertRow(userTable.getRowCount(), new Object[]{
+                userTableModel.insertRow(userTable.getRowCount(), new Object[]{
                     name, username, email, phoneNo, password, position
                 });
 
             }
         }
 
+    }
+
+    private void populateOrderTable() {
+
+        HandleFile file = new HandleFile("./src/saveData/orders.txt");
+
+        String[][] data = file.readFile();
+
+        System.out.println(data[0][1]);
+
+        if (data != null) {
+            for (int i = 0; i < data.length; i++) {
+                String orderId = data[i][0];
+                String customerName = data[i][1];
+                String total = data[i][2];
+                String payment = data[i][3];
+                String status = data[i][4];
+
+                System.out.println(orderId + customerName + total + payment
+                        + status);
+
+                orderTableModel.insertRow(orderTableModel.getRowCount(),
+                        new Object[]{
+                            orderId, customerName, total, payment, status
+                        });
+            }
+        }
     }
 
     private final String username;
@@ -86,14 +147,16 @@ public class ManagingUserHome extends javax.swing.JFrame {
      * @param username
      */
 
-    DefaultTableModel model;
+    DefaultTableModel userTableModel, orderTableModel;
 
     public ManagingUserHome(String username) {
         initComponents();
         this.username = username;
         this.welcomeUserLbl.setText("Hello " + this.username);
-        model = (DefaultTableModel) userTable.getModel();
-        populateTable();
+        userTableModel = (DefaultTableModel) userTable.getModel();
+        orderTableModel = (DefaultTableModel) orderTable.getModel();
+        populateUserTable();
+        populateOrderTable();
     }
 
     @SuppressWarnings("unchecked")
@@ -124,7 +187,24 @@ public class ManagingUserHome extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         positionComboBox = new javax.swing.JComboBox<>();
         ordersTab = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        orderIdTxt = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        totalTxt = new javax.swing.JTextField();
+        jLabel12 = new javax.swing.JLabel();
+        customerNameTxt = new javax.swing.JTextField();
+        jLabel13 = new javax.swing.JLabel();
+        paymentComboBox = new javax.swing.JComboBox<>();
+        jLabel14 = new javax.swing.JLabel();
+        statusComboBox = new javax.swing.JComboBox<>();
+        addOrderBtn = new javax.swing.JButton();
+        saveOrderChangesBtn = new javax.swing.JButton();
+        deleteOrderBtn = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        orderTable = new javax.swing.JTable();
         feedbackTab = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         reportTab = new javax.swing.JPanel();
@@ -185,11 +265,11 @@ public class ManagingUserHome extends javax.swing.JFrame {
             .addGroup(buttonContainerLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(buttonContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(addUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(addUserBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(buttonContainerLayout.createSequentialGroup()
-                        .addComponent(updateUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(updateUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(deleteUserBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(deleteUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         buttonContainerLayout.setVerticalGroup(
@@ -263,21 +343,21 @@ public class ManagingUserHome extends javax.swing.JFrame {
         userFormContainerLayout.setHorizontalGroup(
             userFormContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(userFormContainerLayout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(userFormContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                     .addComponent(jLabel5)
-                    .addComponent(usernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                     .addComponent(jLabel6)
-                    .addComponent(emailField, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                     .addComponent(jLabel7)
-                    .addComponent(phoneNoField, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                     .addComponent(jLabel8)
-                    .addComponent(passwordField, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                     .addComponent(jLabel9)
-                    .addComponent(positionComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(usernameField)
+                    .addComponent(emailField)
+                    .addComponent(phoneNoField)
+                    .addComponent(passwordField)
+                    .addComponent(positionComboBox, 0, 225, Short.MAX_VALUE)
+                    .addComponent(nameField))
+                .addGap(35, 35, 35))
         );
         userFormContainerLayout.setVerticalGroup(
             userFormContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -316,14 +396,14 @@ public class ManagingUserHome extends javax.swing.JFrame {
             .addGroup(usersTabLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(usersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(userFormContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(buttonContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                    .addComponent(userFormContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(usersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(usersTabLayout.createSequentialGroup()
                         .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())
-                    .addComponent(userDetailContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)))
+                    .addComponent(userDetailContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE)))
         );
         usersTabLayout.setVerticalGroup(
             usersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -343,23 +423,163 @@ public class ManagingUserHome extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Users", usersTab);
 
-        jLabel2.setText("jLabel2");
+        jLabel2.setText("Order ID");
+
+        jLabel11.setText("Customer Name");
+
+        jLabel12.setText("Total");
+
+        jLabel13.setText("Payment");
+
+        paymentComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "pending", "completed" }));
+
+        jLabel14.setText("Delivery Status");
+
+        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pending", "On Process", "Delivered" }));
+        statusComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statusComboBoxActionPerformed(evt);
+            }
+        });
+
+        addOrderBtn.setText("Add Order");
+        addOrderBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                addOrderBtnMouseClicked(evt);
+            }
+        });
+
+        saveOrderChangesBtn.setText("Save Changes");
+        saveOrderChangesBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                saveOrderChangesBtnMouseClicked(evt);
+            }
+        });
+
+        deleteOrderBtn.setText("Delete");
+        deleteOrderBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                deleteOrderBtnMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                deleteOrderBtnMouseEntered(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(orderIdTxt)
+                    .addComponent(totalTxt)
+                    .addComponent(customerNameTxt, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(paymentComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(statusComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(addOrderBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel11)
+                            .addComponent(jLabel12)
+                            .addComponent(jLabel13)
+                            .addComponent(jLabel14)
+                            .addComponent(jLabel2))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(saveOrderChangesBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(deleteOrderBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(orderIdTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(customerNameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(totalTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(paymentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(addOrderBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveOrderChangesBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(deleteOrderBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel10.setText("Orders");
+
+        orderTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Order ID", "Customer Name", "Total", "Payment", "Status"
+            }
+        ));
+        jScrollPane1.setViewportView(orderTable);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout ordersTabLayout = new javax.swing.GroupLayout(ordersTab);
         ordersTab.setLayout(ordersTabLayout);
         ordersTabLayout.setHorizontalGroup(
             ordersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ordersTabLayout.createSequentialGroup()
-                .addGap(129, 129, 129)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(708, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         ordersTabLayout.setVerticalGroup(
             ordersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ordersTabLayout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(jLabel2)
-                .addContainerGap(465, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(ordersTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Orders", ordersTab);
@@ -380,7 +600,7 @@ public class ManagingUserHome extends javax.swing.JFrame {
             .addGroup(feedbackTabLayout.createSequentialGroup()
                 .addGap(42, 42, 42)
                 .addComponent(jLabel3)
-                .addContainerGap(451, Short.MAX_VALUE))
+                .addContainerGap(457, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Feedbacks", feedbackTab);
@@ -401,7 +621,7 @@ public class ManagingUserHome extends javax.swing.JFrame {
             .addGroup(reportTabLayout.createSequentialGroup()
                 .addGap(39, 39, 39)
                 .addComponent(jLabel4)
-                .addContainerGap(454, Short.MAX_VALUE))
+                .addContainerGap(460, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Reports", reportTab);
@@ -449,12 +669,16 @@ public class ManagingUserHome extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_phoneNoFieldActionPerformed
 
+    
+    // ***************************** User CRUD Funtions **********************
+    
+    // adds new user
     private void addUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addUserBtnMouseClicked
 
         String name, username, email, phoneNo, password;
         int position;
 
-        if (validator()) {
+        if (UserFormValidator()) {
             name = nameField.getText();
             username = usernameField.getText();
             email = emailField.getText();
@@ -462,8 +686,7 @@ public class ManagingUserHome extends javax.swing.JFrame {
             password = passwordField.getText();
             position = positionComboBox.getSelectedIndex();
 
-            System.out.println(position);
-
+     
             if (position == 0) {
                 DeliveryUser user = new DeliveryUser(name, username, email,
                         phoneNo, password);
@@ -475,11 +698,11 @@ public class ManagingUserHome extends javax.swing.JFrame {
                         phoneNo, password);
                 user.register();
             }
-            model.setRowCount(0);
-            populateTable();
-            JOptionPane.showMessageDialog(ManagingUserHome.this, position);
+            userTableModel.setRowCount(0);
+            populateUserTable();
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "User Added");
 
-            clearFields();
+            clearUserForm();
         }
     }//GEN-LAST:event_addUserBtnMouseClicked
 
@@ -494,7 +717,8 @@ public class ManagingUserHome extends javax.swing.JFrame {
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
         userTable.clearSelection();
     }//GEN-LAST:event_formMouseClicked
-
+    
+    // deletes selected user 
     private void deleteUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteUserBtnMouseClicked
         // TODO add your handling code here:
 
@@ -505,72 +729,180 @@ public class ManagingUserHome extends javax.swing.JFrame {
         }
 
         // removing row in user side
-        model.removeRow(userTable.getSelectedRow());
+        userTableModel.removeRow(userTable.getSelectedRow());
 
-        // creating Api object
-        Api api = new Api("./src/saveData/users.txt");
+        // creating file object
+        HandleFile file = new HandleFile("./src/saveData/users.txt");
 
         // calling deleteData method to delete the existing file and creating 
         // a new file with the same name
-        api.deleteData();
+        file.deleteData();
 
         // looping through the table and appending each row data in the new
         // file
-        for (int i = 0; i < model.getRowCount(); i++) {
-            String name = (String) model.getValueAt(i, 0);
-            String username = (String) model.getValueAt(i, 1);
-            String email = (String) model.getValueAt(i, 2);
-            String phoneNo = (String) model.getValueAt(i, 3);
-            String password = (String) model.getValueAt(i, 4);
-            String position = (String) model.getValueAt(i, 5);
+        for (int i = 0; i < userTableModel.getRowCount(); i++) {
+            String name = (String) userTableModel.getValueAt(i, 0); // getValueAt(row, column)
+            String username = (String) userTableModel.getValueAt(i, 1);
+            String email = (String) userTableModel.getValueAt(i, 2);
+            String phoneNo = (String) userTableModel.getValueAt(i, 3);
+            String password = (String) userTableModel.getValueAt(i, 4);
+            String position = (String) userTableModel.getValueAt(i, 5);
 
             String data = name + "," + username + "," + email + ","
                     + phoneNo + "," + password + "," + position + "\n";
-
-            api.appendStrToFile(data);
+            
+            file.appendStrToFile(data);
         }
-
+        
         // resetting table and populating the table again by reading the newly
         // created and appended file
-        model.setRowCount(0);
-        populateTable();
+        userTableModel.setRowCount(0);
+        populateUserTable();
 
         JOptionPane.showMessageDialog(ManagingUserHome.this, "User Deleted");
     }//GEN-LAST:event_deleteUserBtnMouseClicked
 
     private void updateUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_updateUserBtnMouseClicked
-        
-        // creating an Api object
-        Api api = new Api("./src/saveData/users.txt");
-        
+
+        // creating an file object
+        HandleFile file = new HandleFile("./src/saveData/users.txt");
+
         // calling deleteData method to delete the exisitng file and creating 
         // a new file with the same name
-        api.deleteData();
-        
+        file.deleteData();
+
         // looping throuth the table and appending each row data in the new 
         // file
-        for (int i = 0; i < model.getRowCount(); i++) {
-            String name = (String) model.getValueAt(i, 0);
-            String username = (String) model.getValueAt(i, 1);
-            String email = (String) model.getValueAt(i, 2);
-            String phoneNo = (String) model.getValueAt(i, 3);
-            String password = (String) model.getValueAt(i, 4);
-            String position = (String) model.getValueAt(i, 5);
+        for (int i = 0; i < userTableModel.getRowCount(); i++) {
+            String name = (String) userTableModel.getValueAt(i, 0);
+            String username = (String) userTableModel.getValueAt(i, 1);
+            String email = (String) userTableModel.getValueAt(i, 2);
+            String phoneNo = (String) userTableModel.getValueAt(i, 3);
+            String password = (String) userTableModel.getValueAt(i, 4);
+            String position = (String) userTableModel.getValueAt(i, 5);
 
             String data = name + "," + username + "," + email + ","
                     + phoneNo + "," + password + "," + position + "\n";
 
-            api.appendStrToFile(data);
+            file.appendStrToFile(data);
 
         }
-        
+
         // resetting table and populating the table again by reading the newly
         // created and appended file
-        model.setRowCount(0);
-        populateTable();
+        userTableModel.setRowCount(0);
+        populateUserTable();
         JOptionPane.showMessageDialog(ManagingUserHome.this, "Table Updated");
     }//GEN-LAST:event_updateUserBtnMouseClicked
 
+    // *********************** USER CRUD funtions end *************************
+    
+    private void statusComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_statusComboBoxActionPerformed
+    
+    
+    // ********************** Order CRUD funtions Start *********************
+    private void addOrderBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addOrderBtnMouseClicked
+
+        if (orderFormValidator()) {
+            String orderId = orderIdTxt.getText();
+            String customerName = customerNameTxt.getText();
+            String totalAmt = totalTxt.getText();
+            String payment = paymentComboBox.getSelectedItem().toString();
+            String status = statusComboBox.getSelectedItem().toString();
+
+            Order newOrder = new Order(orderId, customerName, totalAmt, payment,
+                    status);
+
+            newOrder.addOrder();
+
+            orderTableModel.setRowCount(0);
+            populateOrderTable();
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "order added");
+
+            clearOrderForm();
+        }
+
+    }//GEN-LAST:event_addOrderBtnMouseClicked
+
+    private void deleteOrderBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteOrderBtnMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deleteOrderBtnMouseEntered
+
+    private void deleteOrderBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteOrderBtnMouseClicked
+
+        // checking if user has selected any row
+        if (orderTable.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Select a row");
+            return;
+        }
+
+        // removing row in user view
+        orderTableModel.removeRow(orderTable.getSelectedRow());
+
+        // creating file object
+        HandleFile file = new HandleFile("./src/saveData/orders.txt");
+
+        // calling deleteData method to delete the exisiting file and creating 
+        // a new file with the same name
+        file.deleteData();
+
+        // looping throught the table and appending each row data in the new 
+        // file
+        for (int i = 0; i < orderTableModel.getRowCount(); i++) {
+            String orderId = (String) orderTableModel.getValueAt(i, 0);
+            String customerName = (String) orderTableModel.getValueAt(i, 1);
+            String total = (String) orderTableModel.getValueAt(i, 2);
+            String payment = (String) orderTableModel.getValueAt(i, 3);
+            String status = (String) orderTableModel.getValueAt(i, 4);
+
+            Order newOrder = new Order(orderId, customerName, total, payment,
+                    status);
+            newOrder.addOrder();
+        }
+
+        // resettingg table and populating the tavle again by reading the newly
+        // created and appended file
+        orderTableModel.setRowCount(0);
+        populateOrderTable();
+
+        JOptionPane.showMessageDialog(ManagingUserHome.this, "Order deleted");
+
+    }//GEN-LAST:event_deleteOrderBtnMouseClicked
+
+    private void saveOrderChangesBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveOrderChangesBtnMouseClicked
+
+        // crreating an file object
+        HandleFile file = new HandleFile("./src/saveData/orders.txt");
+
+        // callling deleteData method to delete the existing file and create
+        // a new file with the same name
+        file.deleteData();
+
+        // looping through the table and appending each row in the new file
+        for (int i = 0; i < orderTableModel.getRowCount(); i++) {
+            String orderId = (String) orderTableModel.getValueAt(i, 0);
+            String customerName = (String) orderTableModel.getValueAt(i, 1);
+            String total = (String) orderTableModel.getValueAt(i, 2);
+            String payment = (String) orderTableModel.getValueAt(i, 3);
+            String status = (String) orderTableModel.getValueAt(i, 4);
+
+            Order newOrder = new Order(orderId, customerName, total, payment,
+                    status);
+            newOrder.addOrder();
+        }
+
+        // resettingg table and populating the tavle again by reading the newly
+        // created and appended file
+        orderTableModel.setRowCount(0);
+        populateOrderTable();
+
+        JOptionPane.showMessageDialog(ManagingUserHome.this, "Order saved");
+
+    }//GEN-LAST:event_saveOrderChangesBtnMouseClicked
+
+    // ************************** Order CRUD funtions end ******************
     /**
      * @param args the command line arguments
      */
@@ -584,12 +916,20 @@ public class ManagingUserHome extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addOrderBtn;
     private javax.swing.JButton addUserBtn;
     private javax.swing.JPanel buttonContainer;
+    private javax.swing.JTextField customerNameTxt;
+    private javax.swing.JButton deleteOrderBtn;
     private javax.swing.JButton deleteUserBtn;
     private javax.swing.JTextField emailField;
     private javax.swing.JPanel feedbackTab;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -598,14 +938,23 @@ public class ManagingUserHome extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField nameField;
+    private javax.swing.JTextField orderIdTxt;
+    private javax.swing.JTable orderTable;
     private javax.swing.JPanel ordersTab;
     private javax.swing.JTextField passwordField;
+    private javax.swing.JComboBox<String> paymentComboBox;
     private javax.swing.JTextField phoneNoField;
     private javax.swing.JComboBox<String> positionComboBox;
     private javax.swing.JPanel reportTab;
+    private javax.swing.JButton saveOrderChangesBtn;
+    private javax.swing.JComboBox<String> statusComboBox;
     private javax.swing.JLabel title;
+    private javax.swing.JTextField totalTxt;
     private javax.swing.JButton updateUserBtn;
     private javax.swing.JScrollPane userDetailContainer;
     private javax.swing.JPanel userFormContainer;

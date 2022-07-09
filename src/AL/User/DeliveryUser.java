@@ -1,6 +1,6 @@
-package Auth;
+package AL.User;
 
-import DBL.Api;
+import DBL.HandleFile;
 
 public class DeliveryUser extends User {
 
@@ -19,7 +19,7 @@ public class DeliveryUser extends User {
     }
 
     public void register() {
-        Api api = new Api("./src/saveData/users.txt");
+        HandleFile api = new HandleFile("./src/saveData/users.txt");
         String data = this.name + "," + this.username + "," + this.email + ","
                 + this.phoneNo + "," + this.password + "," + this.post + "\n";
         api.appendStrToFile(data);

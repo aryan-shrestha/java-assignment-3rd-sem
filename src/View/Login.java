@@ -1,5 +1,5 @@
 package View;
-import Auth.ManagingUser;
+import AL.User.ManagingUser;
 
 public class Login extends javax.swing.JFrame {
 
