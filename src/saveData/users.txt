@@ -1,3 +1,5 @@
 admin,admin,admin@email.com,90909090,admin,managing
-newAdmin,newAdmin,newadmin2@email.com,90909090,newAdmin,Managing
-newDelivery user,newDeliveryUser,deliveryUser@email.com,909090909,deliveryPassword,Delivery
+srijana,srijana,srijana@email.com,90909090,srijanaPassword,Delivery
+ashish,ashish,ashish@email.com,9898989898,ashishPassword,Delivery
+dhan,dhan,dhan@email.com,0909090909,dhanPassword,Managing
+asdaads,asdasd,dasda,asdad,adsadas,Delivery

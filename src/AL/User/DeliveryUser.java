@@ -1,15 +1,12 @@
 package AL.User;
 
 import DBL.HandleFile;
+import javax.swing.table.DefaultTableModel;
 
 public class DeliveryUser extends User {
 
-    public DeliveryUser(String name, String username, String email, String phoneNo, String password) {
-        this.name = name;
-        this.username = username;
-        this.email = email;
-        this.phoneNo = phoneNo;
-        this.password = password;
+    public DeliveryUser() {
+       
         this.post = "Delivery";
     }
 
@@ -18,10 +15,13 @@ public class DeliveryUser extends User {
         return true;
     }
 
-    public void register() {
-        HandleFile api = new HandleFile("./src/saveData/users.txt");
-        String data = this.name + "," + this.username + "," + this.email + ","
-                + this.phoneNo + "," + this.password + "," + this.post + "\n";
-        api.appendStrToFile(data);
+    public void create(String name, String username, String email, 
+            String phoneNo, String password, DefaultTableModel table) {
+        HandleFile file = new HandleFile(this.fileUrl);
+        String data = name + "," + username + "," + email + ","
+                + phoneNo + "," + password + "," + post + "\n";
+        file.appendStrToFile(data);
+        String arr[][] = file.readFile();
+        file.populateTable(table, arr);
     }
 }

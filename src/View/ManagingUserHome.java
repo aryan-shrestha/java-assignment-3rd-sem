@@ -5,6 +5,7 @@ import AL.User.DeliveryUser;
 import AL.User.ManagingUser;
 import DBL.HandleFile;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 import javax.swing.table.DefaultTableModel;
 
@@ -14,129 +15,20 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ManagingUserHome extends javax.swing.JFrame {
 
-    // validate each fields if its empty
-    private boolean UserFormValidator() {
-
-        if (nameField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter name");
-            nameField.grabFocus();
-            return false;
-        }
-
-        if (usernameField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter username");
-            usernameField.grabFocus();
-            return false;
-        }
-
-        if (emailField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter email");
-            emailField.grabFocus();
-            return false;
-        }
-
-        if (phoneNoField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter phone number");
-            phoneNoField.grabFocus();
-            return false;
-        }
-        if (passwordField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter password");
-            passwordField.grabFocus();
-            return false;
+    // validates all fields returns false if any txt fields are empty
+    private boolean validateForm(JTextField[] textFields){
+        for(JTextField textField : textFields){
+            if(textField.getText().trim().isEmpty()){
+                return false;
+            }
         }
         return true;
     }
 
-    private boolean orderFormValidator() {
-
-        if (orderIdTxt.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter name");
-            orderIdTxt.grabFocus();
-            return false;
-        }
-
-        if (customerNameTxt.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter "
-                    + "customer name");
-            customerNameTxt.grabFocus();
-            return false;
-        }
-
-        if (totalTxt.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter "
-                    + "total amount");
-            totalTxt.grabFocus();
-            return false;
-        }
-
-        return true;
-    }
-
-    // reset all the input fields 
-    private void clearUserForm() {
-        nameField.setText("name");
-        usernameField.setText("username");
-        emailField.setText("email");
-        phoneNoField.setText("phone no");
-        passwordField.setText("password");
-    }
-
-    private void clearOrderForm() {
-        orderIdTxt.setText("");
-        customerNameTxt.setText("");
-        totalTxt.setText("");
-
-    }
-
-    // inserts data into the user table
-    private void populateUserTable() {
-
-        HandleFile file = new HandleFile("./src/saveData/users.txt");
-
-        String[][] data = file.readFile();
-
-        if (data != null) {
-            for (int i = 0; i < data.length; i++) {
-                String name = data[i][0];
-                String username = data[i][1];
-                String email = data[i][2];
-                String phoneNo = data[i][3];
-                String password = data[i][4];
-                String position = data[i][5];
-                userTableModel.insertRow(userTable.getRowCount(), new Object[]{
-                    name, username, email, phoneNo, password, position
-                });
-
-            }
-        }
-
-    }
-
-    private void populateOrderTable() {
-
-        HandleFile file = new HandleFile("./src/saveData/orders.txt");
-
-        String[][] data = file.readFile();
-
-        System.out.println(data[0][1]);
-
-        if (data != null) {
-            for (int i = 0; i < data.length; i++) {
-                String orderId = data[i][0];
-                String customerName = data[i][1];
-                String total = data[i][2];
-                String payment = data[i][3];
-                String status = data[i][4];
-
-                System.out.println(orderId + customerName + total + payment
-                        + status);
-
-                orderTableModel.insertRow(orderTableModel.getRowCount(),
-                        new Object[]{
-                            orderId, customerName, total, payment, status
-                        });
-            }
+    // reset all the input fields     
+    private void clearForm(JTextField[] textFields){
+        for(JTextField textField : textFields){
+            textField.setText("");
         }
     }
 
@@ -155,8 +47,15 @@ public class ManagingUserHome extends javax.swing.JFrame {
         this.welcomeUserLbl.setText("Hello " + this.username);
         userTableModel = (DefaultTableModel) userTable.getModel();
         orderTableModel = (DefaultTableModel) orderTable.getModel();
-        populateUserTable();
-        populateOrderTable();
+        
+        HandleFile userFile = new HandleFile("./src/saveData/users.txt");
+        String[][] userData = userFile.readFile();
+        userFile.populateTable(userTableModel, userData);
+
+        HandleFile orderFile = new HandleFile("./src/saveData/orders.txt");
+        String[][] orderData = orderFile.readFile();
+        orderFile.populateTable(orderTableModel, orderData);
+
     }
 
     @SuppressWarnings("unchecked")
@@ -669,16 +568,17 @@ public class ManagingUserHome extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_phoneNoFieldActionPerformed
 
-    
     // ***************************** User CRUD Funtions **********************
-    
     // adds new user
     private void addUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addUserBtnMouseClicked
 
         String name, username, email, phoneNo, password;
         int position;
-
-        if (UserFormValidator()) {
+        JTextField[] textFields = {nameField, usernameField, emailField, 
+            phoneNoField, passwordField
+        };
+        
+        if (validateForm(textFields)) {
             name = nameField.getText();
             username = usernameField.getText();
             email = emailField.getText();
@@ -686,24 +586,25 @@ public class ManagingUserHome extends javax.swing.JFrame {
             password = passwordField.getText();
             position = positionComboBox.getSelectedIndex();
 
-     
             if (position == 0) {
-                DeliveryUser user = new DeliveryUser(name, username, email,
-                        phoneNo, password);
-                user.register();
+                DeliveryUser user = new DeliveryUser();
+                user.create(name, username, email,phoneNo, password, 
+                        userTableModel);
             }
 
             if (position == 1) {
-                ManagingUser user = new ManagingUser(name, username, email,
-                        phoneNo, password);
-                user.register();
+                ManagingUser user = new ManagingUser();
+                user.create(name, username, email, phoneNo, password, 
+                        userTableModel);
             }
-            userTableModel.setRowCount(0);
-            populateUserTable();
+                    
+            clearForm(textFields);
             JOptionPane.showMessageDialog(ManagingUserHome.this, "User Added");
-
-            clearUserForm();
-        }
+        } else {
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Input data in"
+                    + " the input fields");
+        } 
+            
     }//GEN-LAST:event_addUserBtnMouseClicked
 
     private void usernameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameFieldActionPerformed
@@ -717,7 +618,7 @@ public class ManagingUserHome extends javax.swing.JFrame {
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
         userTable.clearSelection();
     }//GEN-LAST:event_formMouseClicked
-    
+
     // deletes selected user 
     private void deleteUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteUserBtnMouseClicked
         // TODO add your handling code here:
@@ -727,101 +628,57 @@ public class ManagingUserHome extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(ManagingUserHome.this, "Select a row");
             return;
         }
-
-        // removing row in user side
-        userTableModel.removeRow(userTable.getSelectedRow());
-
-        // creating file object
-        HandleFile file = new HandleFile("./src/saveData/users.txt");
-
-        // calling deleteData method to delete the existing file and creating 
-        // a new file with the same name
-        file.deleteData();
-
-        // looping through the table and appending each row data in the new
-        // file
-        for (int i = 0; i < userTableModel.getRowCount(); i++) {
-            String name = (String) userTableModel.getValueAt(i, 0); // getValueAt(row, column)
-            String username = (String) userTableModel.getValueAt(i, 1);
-            String email = (String) userTableModel.getValueAt(i, 2);
-            String phoneNo = (String) userTableModel.getValueAt(i, 3);
-            String password = (String) userTableModel.getValueAt(i, 4);
-            String position = (String) userTableModel.getValueAt(i, 5);
-
-            String data = name + "," + username + "," + email + ","
-                    + phoneNo + "," + password + "," + position + "\n";
-            
-            file.appendStrToFile(data);
-        }
         
-        // resetting table and populating the table again by reading the newly
-        // created and appended file
-        userTableModel.setRowCount(0);
-        populateUserTable();
+        int rowIndex = userTable.getSelectedRow();
+        String role = userTable.getValueAt(rowIndex, 5).toString();
+        
+        // removing row in user side
+        userTableModel.removeRow(rowIndex);
+        
+        if(role.equalsIgnoreCase("Delivery")){
+            DeliveryUser user = new DeliveryUser();
+            user.delete(userTableModel);
+        }
+        if(role.equalsIgnoreCase("Managing")) {
+            ManagingUser user = new ManagingUser();
+            user.delete(userTableModel);
+        }
 
         JOptionPane.showMessageDialog(ManagingUserHome.this, "User Deleted");
     }//GEN-LAST:event_deleteUserBtnMouseClicked
 
     private void updateUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_updateUserBtnMouseClicked
 
-        // creating an file object
-        HandleFile file = new HandleFile("./src/saveData/users.txt");
-
-        // calling deleteData method to delete the exisitng file and creating 
-        // a new file with the same name
-        file.deleteData();
-
-        // looping throuth the table and appending each row data in the new 
-        // file
-        for (int i = 0; i < userTableModel.getRowCount(); i++) {
-            String name = (String) userTableModel.getValueAt(i, 0);
-            String username = (String) userTableModel.getValueAt(i, 1);
-            String email = (String) userTableModel.getValueAt(i, 2);
-            String phoneNo = (String) userTableModel.getValueAt(i, 3);
-            String password = (String) userTableModel.getValueAt(i, 4);
-            String position = (String) userTableModel.getValueAt(i, 5);
-
-            String data = name + "," + username + "," + email + ","
-                    + phoneNo + "," + password + "," + position + "\n";
-
-            file.appendStrToFile(data);
-
-        }
-
-        // resetting table and populating the table again by reading the newly
-        // created and appended file
-        userTableModel.setRowCount(0);
-        populateUserTable();
+        
+        
         JOptionPane.showMessageDialog(ManagingUserHome.this, "Table Updated");
     }//GEN-LAST:event_updateUserBtnMouseClicked
 
     // *********************** USER CRUD funtions end *************************
-    
+
     private void statusComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_statusComboBoxActionPerformed
-    
-    
+
     // ********************** Order CRUD funtions Start *********************
     private void addOrderBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addOrderBtnMouseClicked
-
-        if (orderFormValidator()) {
+        JTextField[] textFields = {orderIdTxt, customerNameTxt, totalTxt};
+        if (validateForm(textFields)) {
             String orderId = orderIdTxt.getText();
             String customerName = customerNameTxt.getText();
             String totalAmt = totalTxt.getText();
             String payment = paymentComboBox.getSelectedItem().toString();
             String status = statusComboBox.getSelectedItem().toString();
-
-            Order newOrder = new Order(orderId, customerName, totalAmt, payment,
-                    status);
-
-            newOrder.addOrder();
-
-            orderTableModel.setRowCount(0);
-            populateOrderTable();
+            
+            Order newOrder = new Order();
+            newOrder.create(orderId, customerName, totalAmt, payment, status,
+                        orderTableModel);
+  
+            clearForm(textFields);
             JOptionPane.showMessageDialog(ManagingUserHome.this, "order added");
-
-            clearOrderForm();
+        } else {
+            JOptionPane.showMessageDialog(ManagingUserHome.this, "Enter data "
+                    + "in the input fields");
         }
 
     }//GEN-LAST:event_addOrderBtnMouseClicked
@@ -841,68 +698,21 @@ public class ManagingUserHome extends javax.swing.JFrame {
         // removing row in user view
         orderTableModel.removeRow(orderTable.getSelectedRow());
 
-        // creating file object
-        HandleFile file = new HandleFile("./src/saveData/orders.txt");
-
-        // calling deleteData method to delete the exisiting file and creating 
-        // a new file with the same name
-        file.deleteData();
-
-        // looping throught the table and appending each row data in the new 
-        // file
-        for (int i = 0; i < orderTableModel.getRowCount(); i++) {
-            String orderId = (String) orderTableModel.getValueAt(i, 0);
-            String customerName = (String) orderTableModel.getValueAt(i, 1);
-            String total = (String) orderTableModel.getValueAt(i, 2);
-            String payment = (String) orderTableModel.getValueAt(i, 3);
-            String status = (String) orderTableModel.getValueAt(i, 4);
-
-            Order newOrder = new Order(orderId, customerName, total, payment,
-                    status);
-            newOrder.addOrder();
-        }
-
-        // resettingg table and populating the tavle again by reading the newly
-        // created and appended file
-        orderTableModel.setRowCount(0);
-        populateOrderTable();
+        Order order = new Order();  
+        order.delete(orderTableModel);
 
         JOptionPane.showMessageDialog(ManagingUserHome.this, "Order deleted");
-
     }//GEN-LAST:event_deleteOrderBtnMouseClicked
 
     private void saveOrderChangesBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveOrderChangesBtnMouseClicked
 
-        // crreating an file object
-        HandleFile file = new HandleFile("./src/saveData/orders.txt");
-
-        // callling deleteData method to delete the existing file and create
-        // a new file with the same name
-        file.deleteData();
-
-        // looping through the table and appending each row in the new file
-        for (int i = 0; i < orderTableModel.getRowCount(); i++) {
-            String orderId = (String) orderTableModel.getValueAt(i, 0);
-            String customerName = (String) orderTableModel.getValueAt(i, 1);
-            String total = (String) orderTableModel.getValueAt(i, 2);
-            String payment = (String) orderTableModel.getValueAt(i, 3);
-            String status = (String) orderTableModel.getValueAt(i, 4);
-
-            Order newOrder = new Order(orderId, customerName, total, payment,
-                    status);
-            newOrder.addOrder();
-        }
-
-        // resettingg table and populating the tavle again by reading the newly
-        // created and appended file
-        orderTableModel.setRowCount(0);
-        populateOrderTable();
-
+        Order order = new Order();
+        order.update(orderTableModel);
         JOptionPane.showMessageDialog(ManagingUserHome.this, "Order saved");
 
     }//GEN-LAST:event_saveOrderChangesBtnMouseClicked
 
-    // ************************** Order CRUD funtions end ******************
+    // ****************** Order CRUD funtions end ******************
     /**
      * @param args the command line arguments
      */

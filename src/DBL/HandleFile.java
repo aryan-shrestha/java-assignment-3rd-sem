@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -110,10 +111,25 @@ public class HandleFile {
             System.out.println("exception occured "+ e);
         }
     }
-     
+         
     public void deleteData() {
         File orgFile = new File(this.filePath);
         orgFile.delete();
         File newFile = new File(this.filePath);
+        
+    }
+    
+    public void populateTable(DefaultTableModel table, String[][] data){
+        table.setRowCount(0);
+        for(int i=0; i<data.length; i++){
+            String[] row = new String[data[i].length];
+            
+            for(int j=0; j<data[i].length; j++){
+                row[j] = data[i][j];
+            }
+            table.addRow(row);
+        }
+       
+        
     }
 }

@@ -192,10 +192,10 @@ public class Login extends javax.swing.JFrame {
         String username = usernameText.getText();
         String password = String.valueOf(passwordText.getPassword()) ;
         
-        ManagingUser user = new ManagingUser(username, password);
+        ManagingUser user = new ManagingUser();
         
        
-        if (user.login(user.getUsername(), user.getPassword())){
+        if (user.login(username, password)){
             this.setVisible(false);
             ManagingUserHome fm = new ManagingUserHome(username);
             fm.setVisible(true);
