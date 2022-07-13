@@ -55,7 +55,6 @@ public class ManagingUserHome extends javax.swing.JFrame {
         HandleFile orderFile = new HandleFile("./src/saveData/orders.txt");
         String[][] orderData = orderFile.readFile();
         orderFile.populateTable(orderTableModel, orderData);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -649,8 +648,7 @@ public class ManagingUserHome extends javax.swing.JFrame {
 
     private void updateUserBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_updateUserBtnMouseClicked
 
-        
-        
+     
         JOptionPane.showMessageDialog(ManagingUserHome.this, "Table Updated");
     }//GEN-LAST:event_updateUserBtnMouseClicked
 
@@ -664,6 +662,7 @@ public class ManagingUserHome extends javax.swing.JFrame {
     private void addOrderBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addOrderBtnMouseClicked
         JTextField[] textFields = {orderIdTxt, customerNameTxt, totalTxt};
         if (validateForm(textFields)) {
+            
             String orderId = orderIdTxt.getText();
             String customerName = customerNameTxt.getText();
             String totalAmt = totalTxt.getText();
